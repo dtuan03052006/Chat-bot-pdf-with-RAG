@@ -29,12 +29,12 @@ app.add_middleware(
 
 
 class AskRequest(BaseModel):
-    question: str = Field(..., example="Nội dung chính của tài liệu là gì?", description="Câu hỏi của bạn")
-    top_k: Optional[int] = Field(default=3, example=3, description="Số đoạn trích dẫn liên quan nhất cần lấy")
+    question: str = Field(..., json_schema_extra={"example": "Nội dung chính của tài liệu là gì?"}, description="Câu hỏi của bạn")
+    top_k: Optional[int] = Field(default=3, json_schema_extra={"example": 3}, description="Số đoạn trích dẫn liên quan nhất cần lấy")
 
 
 class IndexLocalRequest(BaseModel):
-    file_path: str = Field(..., example="/home/abc/Code/Code AI/RAG/data/31-2024-qh15_1.pdf", description="Đường dẫn tuyệt đối hoặc tương đối tới file PDF")
+    file_path: str = Field(..., json_schema_extra={"example": "/home/abc/Code/Code AI/RAG/data/31-2024-qh15_1.pdf"}, description="Đường dẫn tuyệt đối hoặc tương đối tới file PDF")
 
 
 @app.get("/", tags=["General"])
@@ -132,4 +132,4 @@ def api_index_local(req: IndexLocalRequest):
 
 
 if __name__ == "__main__":
-    uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=False)

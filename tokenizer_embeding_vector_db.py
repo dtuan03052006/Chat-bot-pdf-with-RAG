@@ -11,13 +11,24 @@ embed_model = SentenceTransformer("BAAI/bge-m3", device=device)
 
 client = QdrantClient(path="qdrant_storage")
 collection_name= "pdf_knowledge_base"
+_client = None
+
+
+def get_client():
+    global _client
+    if _client is None:
+        _client = QdrantClient(path="qdrant_storage")
+    return _client
+
 
 def init_collection():
+    client = get_client()
     collections = [c.name for c in client.get_collections().collections]
     if collection_name not in collections:
         client.create_collection(
             collection_name=collection_name,
             vectors_config=VectorParams(size=1024, distance=Distance.COSINE)
+            vectors_config=VectorParams(size=1024, distance=Distance.COSINE),
         )
 
 
@@ -27,24 +38,38 @@ def index_chunks(chunks):
     vector_emb=embed_model.encode(texts,normalize_embeddings=True)
     points=[]
     for chunnk_id,(c,vt) in enumerate( zip(chunks,vector_emb)):
+    client = get_client()
+    texts = [c["text"] for c in chunks]
+    vector_emb = embed_model.encode(texts, normalize_embeddings=True)
+    points = []
+    for chunnk_id, (c, vt) in enumerate(zip(chunks, vector_emb)):
         points.append(
             PointStruct(
                 id=chunnk_id+1,
+                id=chunnk_id + 1,
                 vector=vt.tolist(),
                 payload={
                     "text": c["text"],
                     "source": c["source"],
                     "page": c["page"],
                 }
+                },
             )
         )
     client.upsert(collection_name,points=points)
+    client.upsert(collection_name, points=points)
 
 def retrieve_top_k(query,top_k):
     query_vt=embed_model.encode(query,normalize_embeddings=True)
     result=client.query_points(
+
+def retrieve_top_k(query, top_k):
+    client = get_client()
+    query_vt = embed_model.encode(query, normalize_embeddings=True)
+    result = client.query_points(
         collection_name=collection_name,
         query=query_vt,
         limit=top_k
+        limit=top_k,
     )
     return [res.payload for res in result.points]
