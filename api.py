@@ -3,7 +3,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from main import ask_rag
+from total import ask_rag
 app = FastAPI(
     title="Local Ollama RAG API",
     description="API hỏi đáp tài liệu cục bộ sử dụng Qdrant và Ollama (Gemma 3)",
