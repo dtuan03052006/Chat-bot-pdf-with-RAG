@@ -1,0 +1,28 @@
+# Virtual environment
+.venv/
+
+# VS Code
+.vscode/
+
+# Data
+data/
+
+# Text files
+*.txt
+
+# Environment variables / secrets
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Qdrant local database
+qdrant_db/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+.env
