@@ -1,54 +1,24 @@
-#chunking
-def recursive_split(text,chunk_size,separators):
-    if len(text) < chunk_size:
-        return [text]
-    if not separators:
-        return [
-            text[i: i + chunk_size ] for i in range(0,len(text),chunk_size)
-        ]
-    separator=separators[0]
-    parts=text.split(separator)
-    chunks=[]
-    curr=""
-    for part in parts:
-        if(len(curr) + len(part) + len(separator) <= chunk_size):
-            curr += part + separator
-        else:
-            if curr:
-                chunks.append(curr.strip())
-            if len(part) > chunk_size:
-                sub_text=recursive_split(part,chunk_size,separator[1:])
-                chunk_size.extend(sub_text)
-                curr=""
-            else:
-                curr=part + separator
-    if curr:
-        chunks.append(curr.strip)
 
-    return chunks
 
-#Lancgchain
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-splitter= RecursiveCharacterTextSplitter(
-    chunk_size=100,
-    chunk_overlap=20,
-)
+def chunking(pages_data, chunk_size=600, chunk_overlap=100):
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        separators=["\n\n", "\n", ". ", " ", ""]
+    )
+    all_chunks=[]
 
-text = """
-Python là một ngôn ngữ lập trình phổ biến.
-Python được sử dụng nhiều trong AI và Data Science.
+    for page in pages_data:
+        chunks=splitter.split_text(page["content"])
+        for c in chunks:
+            all_chunks.append({
+                "text" : c,
+                "source": page["metadata"]["source"],
+                "page" : page["metadata"]["page"]
+            }
+            )
+    return all_chunks
 
-FastAPI là framework dùng để xây dựng API bằng Python.
-FastAPI được sử dụng để xây dựng backend.
-
-RAG là kỹ thuật kết hợp LLM với hệ thống tìm kiếm.
-RAG giúp LLM sử dụng dữ liệu bên ngoài.
-"""
-chunks=splitter.split_text(text)
-
-for i, chunk in enumerate(chunks):
-    print(f"Chunk {i}:")
-    print(chunk)
-    print()
     
